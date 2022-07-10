@@ -17,7 +17,7 @@ func TestGormTest(t *testing.T) {
 	}
 
 	data := make([]*models.Problem, 0)
-	err = db.Debug().Find(&data).Error
+	err = db.Debug().First(&data).Error
 
 	if err != nil {
 		t.Fatal(err)

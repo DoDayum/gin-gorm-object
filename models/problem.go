@@ -1,6 +1,9 @@
 package models
 
-import "gorm.io/gorm"
+import (
+	"fmt"
+	"gorm.io/gorm"
+)
 
 type Problem struct {
 	gorm.Model
@@ -14,4 +17,14 @@ type Problem struct {
 
 func (table *Problem) TableName() string {
 	return "problem"
+}
+
+func GetParamList() {
+	data := make([]*Problem, 0)
+	DB.Find(&data)
+
+	for _, datum := range data {
+		fmt.Printf("Problem = %v \n", datum)
+	}
+
 }
