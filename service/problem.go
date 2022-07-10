@@ -1,9 +1,12 @@
 package service
 
 import (
+	"gin_gorm_object/define"
 	"gin_gorm_object/models"
 	"github.com/gin-gonic/gin"
+	"log"
 	"net/http"
+	"strconv"
 )
 
 // GetParamList
@@ -14,6 +17,25 @@ import (
 // @Success 200 {string} json "{"code":"200","msg":"","data":""}"
 // @Router /problem [get]
 func GetParamList(c *gin.Context) {
-	models.GetParamList()
-	c.String(http.StatusOK, "get param list")
+	page, err := strconv.Atoi(c.DefaultQuery("page", define.DefaultPage))
+	size, err := strconv.Atoi(c.DefaultQuery("size", define.DefaultSize))
+	if err != nil {
+		log.Println("get problem page error")
+		return
+	}
+	keyWord := c.Query("keyWord")
+	tx := models.GetParamList(keyWord)
+	date := make([]*models.Problem, 0)
+	page = (page - 1) * size
+	var count int64
+	err = tx.Debug().Omit("content").Count(&count).Offset(page).Limit(size).Find(&date).Error
+	if err != nil {
+		log.Println("get problem list error")
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"code":  200,
+		"date":  date,
+		"count": count,
+	})
 }
